@@ -15,6 +15,8 @@ class Booking extends Model
         'seat_id',
         'departure_date',
         'status',
+        'from_station',
+        'to_station',
     ];
 
     // Relasi ke User

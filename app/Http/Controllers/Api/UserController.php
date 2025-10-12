@@ -6,6 +6,10 @@ use App\Http\Controllers\Controller;
 use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Facades\Mail;
+use Illuminate\Support\Str;
+use Illuminate\Support\Facades\DB;
+
 
 class UserController extends Controller
 {
@@ -89,5 +93,111 @@ class UserController extends Controller
         $request->user()->currentAccessToken()->delete();
 
         return response()->json(['message' => 'Logout berhasil']);
+    }
+
+    /**
+     * STEP A — Ganti password (user sedang login, dari menu Setting)
+     */
+    public function requestPasswordChange(Request $request)
+    {
+        $request->validate([
+            'current_password' => 'required',
+        ]);
+
+        $user = $request->user();
+
+        if (! Hash::check($request->current_password, $user->password)) {
+            return response()->json(['success' => false, 'message' => 'Password lama salah'], 400);
+        }
+
+        // buat token unik
+        $token = Str::random(64);
+        $user->reset_token = $token;
+        $user->save();
+
+        // kirim email ke user
+        $resetUrl = url("/reset-password/$token");
+        Mail::send('emails.change_password', [
+            'url' => $resetUrl,
+            'user' => $user
+        ], function ($m) use ($user) {
+            $m->to($user->email)->subject('Ubah Password Akun Anda');
+        });
+
+        return response()->json([
+            'success' => true,
+            'message' => 'Link ganti password telah dikirim ke email Anda'
+        ]);
+    }
+
+    /**
+     * STEP B — Lupa password (tidak login)
+     */
+    public function forgotPassword(Request $request)
+    {
+        $request->validate([
+            'email' => 'required|email',
+        ]);
+
+        $user = User::where('email', $request->email)->first();
+
+        if (! $user) {
+            return response()->json(['success' => false, 'message' => 'Email tidak ditemukan'], 404);
+        }
+
+        // buat token
+        $token = Str::random(64);
+        $user->reset_token = $token;
+        $user->save();
+
+        // kirim email
+        $resetUrl = url("/reset-password/$token");
+        Mail::send('emails.forgot_password', [
+            'url' => $resetUrl,
+            'user' => $user
+        ], function ($m) use ($user) {
+            $m->to($user->email)->subject('Atur Ulang Password Anda');
+        });
+
+        return response()->json(['success' => true, 'message' => 'Link reset password telah dikirim ke email Anda.']);
+    }
+
+    /**
+     * STEP C — Form ganti/reset password (akses dari email)
+     */
+    public function showResetPasswordForm($token)
+    {
+        $user = User::where('reset_token', $token)->first();
+
+        if (! $user) {
+            return response()->view('auth.token-invalid');
+        }
+
+        return response()->view('auth.reset_password', ['token' => $token]);
+    }
+
+    /**
+     * STEP D — Simpan password baru (semua alur pakai ini)
+     */
+    public function resetPassword(Request $request, $token)
+    {
+        $request->validate([
+            'new_password' => 'required|min:6|confirmed',
+        ]);
+
+        $user = User::where('reset_token', $token)->first();
+
+        if (! $user) {
+            return view('auth.token_invalid');
+        }
+
+        $user->password = Hash::make($request->new_password);
+        $user->reset_token = null;
+        $user->save();
+
+        // Langsung tampilkan halaman sukses
+        return view('auth.password-sukses', [
+            'status' => 'Password berhasil diubah! Silakan login dengan password baru.'
+        ]);
     }
 }

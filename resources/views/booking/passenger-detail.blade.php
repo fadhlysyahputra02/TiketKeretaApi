@@ -7,7 +7,7 @@
 <div class="container my-4">
     <h2>👤 Isi Data Penumpang</h2>
 
-    <form action="{{ route('booking.book', $trip->id) }}" method="POST" id="bookingForm">
+    <form action="{{ route('booking.book', $trip->id) }}" method="GET" id="bookingForm">
         @csrf
         <input type="hidden" name="departure_date" value="{{ session('booking_data.departure_date') }}">
 

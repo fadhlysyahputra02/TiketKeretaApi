@@ -13,6 +13,7 @@ class Passenger extends Model
         'tanggal_lahir',
         'booking_id',
         'seat_id',
+        'status',
     ];
 
     // Relasi ke Booking

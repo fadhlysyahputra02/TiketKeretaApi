@@ -72,7 +72,7 @@ class BookingController extends Controller
         }
 
         return redirect()->route('booking.show', $booking->id)
-            ->with('success', 'Booking berhasil dibuat! Silakan pilih kursi.');
+    ->with('success', 'Booking berhasil dibuat! Silakan pilih kursi.');
     }
 
     public function confirm(Request $request, Booking $booking)

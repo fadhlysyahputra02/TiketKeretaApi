@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\Api\UserController;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\AuthController;
 use App\Http\Controllers\BookingController;
@@ -12,6 +13,17 @@ use App\Http\Controllers\TripController;
 Route::get('/', [AuthController::class, 'showLogin'])->name('login');
 Route::post('/login', [AuthController::class, 'login'])->name('login.post');
 Route::post('/logout', [AuthController::class, 'logout'])->name('logout');
+Route::get('/reset-password/{token}', [UserController::class, 'showResetPasswordForm']);
+Route::post('/reset-password/{token}', [UserController::class, 'resetPassword']);
+
+Route::get('/reset-password/success', function () {
+    return view('auth.password-sukses');
+})->name('password.success');
+
+Route::get('/reset-password/invalid', function () {
+    return view('auth.token-invalid');
+})->name('password.invalid');
+
 
 // Dashboard (hanya bisa diakses kalau sudah login)
 Route::middleware('auth')->group(function () {
@@ -43,7 +55,7 @@ Route::middleware('auth')->group(function () {
     Route::get('/stations/search', [StationController::class, 'searchStations'])->name('stations.search');
 
     //================BOOKING==============
-    Route::post('/booking/{trip}/book', [BookingController::class, 'book'])->name('booking.book');
+    Route::get('/booking/{trip}/book', [BookingController::class, 'book'])->name('booking.book');
     Route::get('/booking', [BookingController::class, 'index'])->name('booking.create');
     Route::post('/booking', [BookingController::class, 'store'])->name('booking.store');
     Route::get('/booking/{booking}', [BookingController::class, 'show'])->name('booking.show');
@@ -63,6 +75,4 @@ Route::middleware('auth')->group(function () {
     Route::get('/user', function () {
         return view('admin.user.index');
     })->name('user.index');
-
-    
 });

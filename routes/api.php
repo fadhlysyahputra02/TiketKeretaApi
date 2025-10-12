@@ -8,48 +8,59 @@ use App\Http\Controllers\Api\UserController;
 use App\Http\Controllers\Api\BookingController;
 use App\Http\Controllers\Api\SeatController;
 use App\Http\Controllers\Api\PesanController;
+use App\Http\Controllers\Api\PasswordResetController;
 
 // ===== PUBLIC ROUTES =====
 // Auth
 Route::post('/register', [UserController::class, 'register']);
 Route::post('/login', [UserController::class, 'login']);
 
+// Ganti Password
+Route::middleware('auth:sanctum')->post('/request-password-change', [UserController::class, 'requestPasswordChange']);
+// User lupa password
+Route::post('/password/forgot', [UserController::class, 'forgotPassword']);
+
+// User login minta link ubah password
+Route::post('/password/change', [UserController::class, 'requestPasswordChange']);
+
 // ===== PROTECTED ROUTES (harus login) =====
 // Route::middleware('auth:sanctum')->group(function () {
-    // User
-    Route::get('/users', [UserController::class, 'index']);
-    Route::get('/users/{id}', [UserController::class, 'show']);
+// User
+Route::get('/users', [UserController::class, 'index']);
+Route::get('/users/{id}', [UserController::class, 'show']);
 
-    // Trains
-    Route::get('/trains', [ApiTrainController::class, 'index']);
-    Route::get('/trains/{id}', [ApiTrainController::class, 'show']);
-    Route::post('/trains', [ApiTrainController::class, 'store']);
-    Route::put('/trains/{id}', [ApiTrainController::class, 'update']);
-    Route::delete('/trains/{id}', [ApiTrainController::class, 'destroy']);
+// Trains
+Route::get('/trains', [ApiTrainController::class, 'index']);
+Route::get('/trains/{id}', [ApiTrainController::class, 'show']);
+Route::post('/trains', [ApiTrainController::class, 'store']);
+Route::put('/trains/{id}', [ApiTrainController::class, 'update']);
+Route::delete('/trains/{id}', [ApiTrainController::class, 'destroy']);
+Route::get('/trains/{trainId}/seats', [SeatController::class, 'getSeatsByTrain']);
 
-    Route::get('/trains/{trainId}/seats', [SeatController::class, 'getSeatsByTrain']);
-    // Stations
-    Route::get('/stations', [ApiStationController::class, 'index']);
-    Route::get('/stations/{id}', [ApiStationController::class, 'show']);
+// Stations
+Route::get('/stations', [ApiStationController::class, 'index']);
+Route::get('/stations/{id}', [ApiStationController::class, 'show']);
 
-    // Trip Stations
-    Route::get('/trip-stations', [TripStationController::class, 'index']);
-    Route::get('/trip-stations/{id}', [TripStationController::class, 'show']);
-    Route::post('/trip-stations', [TripStationController::class, 'store']);
-    Route::put('/trip-stations/{id}', [TripStationController::class, 'update']);
-    Route::delete('/trip-stations/{id}', [TripStationController::class, 'destroy']);
-    Route::get('/trip/search', [TripStationController::class, 'search']);
-    
-    // Bookings
-    Route::post('/bookings', [BookingController::class, 'store']);
-    Route::get('/bookings/{id}', [BookingController::class, 'show']);
-    Route::get('/my-bookings', [BookingController::class, 'myBookings']);
-    Route::get('/trips/search', [BookingController::class, 'search']);
-    Route::post('/trips/search', [BookingController::class, 'search']);
+// Trip Stations
+Route::get('/trip-stations', [TripStationController::class, 'index']);
+Route::get('/trip-stations/{id}', [TripStationController::class, 'show']);
+Route::post('/trip-stations', [TripStationController::class, 'store']);
+Route::put('/trip-stations/{id}', [TripStationController::class, 'update']);
+Route::delete('/trip-stations/{id}', [TripStationController::class, 'destroy']);
+Route::get('/trip/search', [TripStationController::class, 'search']);
 
+// Bookings
+Route::middleware('auth:sanctum')->get('/bookings', [BookingController::class, 'index']);
+Route::post('/bookings', [BookingController::class, 'store']);
+Route::get('/bookings/{id}', [BookingController::class, 'show']);
+Route::get('/my-bookings', [BookingController::class, 'myBookings']);
+Route::get('/trips/search', [BookingController::class, 'search']);
+Route::post('/trips/search', [BookingController::class, 'search']);
+Route::get('/check-booked-seats', [BookingController::class, 'checkBookedSeats']);
+Route::get('/bookings/{id}/passengers', [BookingController::class, 'passengers']);
 
-
-    Route::post('/pesan', [PesanController::class, 'store']);
-    Route::patch('/bookings/user/{userId}/status', [PesanController::class, 'updateStatusByUser']);
+Route::post('/pesan', [PesanController::class, 'store']);
+Route::patch('/bookings/{bookingId}/confirm', [PesanController::class, 'confirm']);
+Route::post('bookings/{id}/add-passenger', [PesanController::class, 'addPassenger']);
 
 // });
