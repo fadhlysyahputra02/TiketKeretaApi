@@ -14,6 +14,7 @@ return new class extends Migration {
             $table->string('nik')->nullable();
             $table->enum('jenis_kelamin', ['L', 'P'])->nullable();
             $table->date('tanggal_lahir')->nullable();
+            $table->string('status')->default('PENDING');
             $table->timestamps();
         });
     }

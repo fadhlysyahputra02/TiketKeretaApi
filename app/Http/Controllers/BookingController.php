@@ -12,6 +12,26 @@ use Illuminate\Support\Str;
 
 class BookingController extends Controller
 {
+    /**
+     * Konversi nilai jenis_kelamin dari form ('Laki-laki'/'Perempuan')
+     * ke format enum database ('L'/'P').
+     */
+    private function normalizeJenisKelamin(?string $value): ?string
+    {
+        if ($value === null) return null;
+
+        $lower = strtolower(trim($value));
+
+        if (in_array($lower, ['l', 'laki-laki', 'laki', 'male'])) {
+            return 'L';
+        }
+        if (in_array($lower, ['p', 'perempuan', 'wanita', 'female'])) {
+            return 'P';
+        }
+
+        return $value;
+    }
+
     // tampilkan halaman form booking
     public function index()
     {
@@ -66,8 +86,9 @@ class BookingController extends Controller
             'status' => 'PENDING',
         ]);
 
-        // Simpan semua penumpang
+        // Simpan semua penumpang (konversi jenis_kelamin)
         foreach ($request->passengers as $p) {
+            $p['jenis_kelamin'] = $this->normalizeJenisKelamin($p['jenis_kelamin'] ?? null);
             $booking->passengers()->create($p);
         }
 

@@ -7,6 +7,24 @@ use Illuminate\Http\Request;
 
 class StationController extends Controller
 {
+    public function store(Request $request)
+{
+    $request->validate([
+        'code' => 'required|string|unique:stations,code|max:10',
+        'name' => 'required|string|max:255',
+        'city' => 'required|string|max:255',
+        'lat'  => 'nullable|numeric',
+        'lng'  => 'nullable|numeric',
+    ]);
+
+    $station = Station::create($request->all());
+
+    return response()->json([
+        'success' => true,
+        'message' => 'Stasiun berhasil ditambahkan',
+        'data'    => $station
+    ], 201);
+}
     // ambil semua stasiun
     public function index()
     {

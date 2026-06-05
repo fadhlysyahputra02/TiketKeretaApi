@@ -41,7 +41,7 @@
             <label>Tipe</label>
             <select name="type" required>
                 <option value="">-- Pilih --</option>
-                <option value="lokal">Lokall</option>
+                <option value="lokal">Lokal</option>
                 <option value="AK">Antar Kota</option>
             </select>
             @error('type') <small class="error">{{ $message }}</small> @enderror

@@ -10,6 +10,26 @@ use Illuminate\Support\Str;
 
 class PesanController extends Controller
 {
+    /**
+     * Konversi nilai jenis_kelamin dari Flutter ('Laki-laki'/'Perempuan')
+     * ke format enum database ('L'/'P').
+     */
+    private function normalizeJenisKelamin(?string $value): ?string
+    {
+        if ($value === null) return null;
+
+        $lower = strtolower(trim($value));
+
+        if (in_array($lower, ['l', 'laki-laki', 'laki', 'male'])) {
+            return 'L';
+        }
+        if (in_array($lower, ['p', 'perempuan', 'wanita', 'female'])) {
+            return 'P';
+        }
+
+        return $value; // kembalikan aslinya jika tidak dikenali
+    }
+
     public function store(Request $request)
     {
         // Validasi data permintaan
@@ -53,6 +73,8 @@ class PesanController extends Controller
 
             // Simpan semua penumpang melalui relasi booking
             foreach ($request->passengers as $p) {
+                // Konversi jenis_kelamin sebelum insert
+                $p['jenis_kelamin'] = $this->normalizeJenisKelamin($p['jenis_kelamin'] ?? null);
                 $booking->passengers()->create($p);
             }
 
@@ -85,26 +107,24 @@ class PesanController extends Controller
         ]);
     }
 
-
-
     // PesanController.php
     public function addPassenger($bookingId, Request $request)
-{
-    $booking = Booking::findOrFail($bookingId);
+    {
+        $booking = Booking::findOrFail($bookingId);
 
-    $passenger = $booking->passengers()->create([
-        'name' => $request->name,
-        'nik' => $request->nik,
-        'jenis_kelamin' => $request->jenis_kelamin,
-        'tanggal_lahir' => $request->tanggal_lahir,
-        'seat_id' => $request->seat_id,
-    ]);
+        $passenger = $booking->passengers()->create([
+            'name' => $request->name,
+            'nik' => $request->nik,
+            'jenis_kelamin' => $this->normalizeJenisKelamin($request->jenis_kelamin),
+            'tanggal_lahir' => $request->tanggal_lahir,
+            'seat_id' => $request->seat_id,
+        ]);
 
-    return response()->json([
-        'message' => 'Penumpang berhasil ditambahkan',
-        'id' => $passenger->id, // ✅ penting!
-        'passenger' => $passenger, // opsional, untuk debugging / info tambahan
-    ]);
+        return response()->json([
+            'message' => 'Penumpang berhasil ditambahkan',
+            'id' => $passenger->id, // ✅ penting!
+            'passenger' => $passenger, // opsional, untuk debugging / info tambahan
+        ]);
+    }
 }
 
-}

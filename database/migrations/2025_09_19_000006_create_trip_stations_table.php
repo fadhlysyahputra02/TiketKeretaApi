@@ -15,7 +15,7 @@ return new class extends Migration {
             $table->time('arrival_time')->nullable();
             $table->time('departure_time')->nullable();
             $table->integer('station_order')->nullable();
-            $table->integer('day_offset')->default(0);
+            $table->unsignedTinyInteger('day_offset')->default(0);
             $table->timestamps();
         });
     }

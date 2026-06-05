@@ -11,8 +11,8 @@ return new class extends Migration {
             $table->foreignId('train_id')->constrained('trains')->onDelete('cascade');
             $table->foreignId('origin_station_id')->constrained('stations');
             $table->foreignId('destination_station_id')->constrained('stations');
-            $table->time('departure_time');
-            $table->time('arrival_time');
+            $table->time('departure_time')->nullable();
+            $table->time('arrival_time')->nullable();
             $table->string('status')->nullable();
             $table->string('train_name')->nullable();
             $table->integer('day_offset')->default(0);

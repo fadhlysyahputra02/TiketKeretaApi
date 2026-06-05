@@ -9,11 +9,13 @@ return new class extends Migration {
         Schema::create('bookings', function (Blueprint $table) {
             $table->id();
             $table->string('pnr')->unique();
-            $table->foreignId('user_id')->constrained('users')->onDelete('cascade');
+            $table->foreignId('user_id')->nullable()->constrained('users')->onDelete('cascade');
             $table->foreignId('trip_id')->constrained('trips');
             $table->foreignId('seat_id')->nullable()->constrained('seats');
             $table->date('departure_date');
             $table->string('status')->default('pending');
+            $table->string('from_station')->nullable();
+            $table->string('to_station')->nullable();
             $table->timestamps();
         });
     }

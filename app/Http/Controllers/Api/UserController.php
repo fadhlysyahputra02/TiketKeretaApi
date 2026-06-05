@@ -40,7 +40,7 @@ class UserController extends Controller
             'password'      => 'required|string|min:6',
             'no_telp'       => 'nullable|string|max:20',
             'nik'           => 'nullable|string|max:20|unique:users,nik',
-            'jenis_kelamin' => 'nullable|in:Laki-laki,Perempuan',
+            'jenis_kelamin' => 'nullable|in:L,P',
             'tanggal_lahir' => 'nullable|date',
         ]);
 

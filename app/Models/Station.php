@@ -6,7 +6,7 @@ use Illuminate\Database\Eloquent\Model;
 
 class Station extends Model
 {
-    protected $fillable = ['code','name','city','lat','lng'];
+    protected $fillable = ['code', 'name', 'city', 'lat', 'lng'];
 
     public function originTrips() {
         return $this->hasMany(Trip::class, 'origin_station_id');

@@ -39,7 +39,9 @@ Route::get('/trains/{trainId}/seats', [SeatController::class, 'getSeatsByTrain']
 
 // Stations
 Route::get('/stations', [ApiStationController::class, 'index']);
-Route::get('/stations/{id}', [ApiStationController::class, 'show']);
+Route::post('/stations', [ApiStationController::class, 'store']);
+Route::put('/stations/{id}', [ApiStationController::class, 'update']);
+Route::delete('/stations/{id}', [ApiStationController::class, 'destroy']);
 
 // Trip Stations
 Route::get('/trip-stations', [TripStationController::class, 'index']);
